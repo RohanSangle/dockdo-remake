@@ -1,0 +1,27 @@
+[gd_scene load_steps=4 format=3 uid="uid://c8sk0ukws72i"]
+
+[ext_resource type="Script" path="res://scripts/water_splash.gd" id="1_42kof"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_3d4cq"]
+albedo_color = Color(0.0470588, 0.615686, 0.772549, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_xcqh4"]
+material = SubResource("StandardMaterial3D_3d4cq")
+radius = 0.1
+height = 0.3
+
+[node name="WaterSplash" type="Node3D"]
+script = ExtResource("1_42kof")
+
+[node name="SplashParticles" type="CPUParticles3D" parent="."]
+emitting = false
+amount = 4
+one_shot = true
+explosiveness = 1.0
+local_coords = true
+mesh = SubResource("SphereMesh_xcqh4")
+emission_shape = 1
+emission_sphere_radius = 1.0
+direction = Vector3(0, 2, 0)
+initial_velocity_min = 3.0
+initial_velocity_max = 3.0

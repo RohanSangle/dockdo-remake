@@ -1,0 +1,191 @@
+[gd_scene load_steps=22 format=3 uid="uid://73bfbv8g7x8j"]
+
+[ext_resource type="Script" path="res://scripts/world.gd" id="1_1iytt"]
+[ext_resource type="PackedScene" uid="uid://kcmaifdupmxv" path="res://scenes/player_ship.tscn" id="1_fkneg"]
+[ext_resource type="Shader" path="res://Shaders/ocean_shader.gdshader" id="3_176l0"]
+[ext_resource type="PackedScene" uid="uid://bpud5gh5f3v5v" path="res://GUI/minimap.tscn" id="3_qoae3"]
+[ext_resource type="PackedScene" uid="uid://cpjqn6t2pbpct" path="res://assets/patch-grass.glb" id="5_21eab"]
+[ext_resource type="Script" path="res://scripts/fps_display.gd" id="5_c6a6c"]
+[ext_resource type="PackedScene" uid="uid://cn7yoaldyi6v4" path="res://assets/rocks-a.glb" id="6_511a6"]
+[ext_resource type="PackedScene" uid="uid://x1t7sjatxdu" path="res://assets/rocks-c.glb" id="7_l64wg"]
+[ext_resource type="PackedScene" uid="uid://dv0n07bi10jyc" path="res://assets/tower-complete-large.glb" id="8_kcdw3"]
+[ext_resource type="PackedScene" uid="uid://dr60cd0e43mm0" path="res://assets/flag-pirate-pennant.glb" id="9_d0eco"]
+[ext_resource type="PackedScene" uid="uid://b60163qfhkeyb" path="res://assets/patch-sand.glb" id="10_cwq5t"]
+[ext_resource type="PackedScene" uid="uid://jpft6nwm4wob" path="res://assets/structure-platform-dock-small.glb" id="11_xo54m"]
+
+[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_17p7q"]
+sky_horizon_color = Color(0.64625, 0.65575, 0.67075, 1)
+ground_horizon_color = Color(0.64625, 0.65575, 0.67075, 1)
+
+[sub_resource type="Sky" id="Sky_gduav"]
+sky_material = SubResource("ProceduralSkyMaterial_17p7q")
+
+[sub_resource type="Environment" id="Environment_l1d28"]
+background_mode = 2
+sky = SubResource("Sky_gduav")
+tonemap_mode = 2
+ssr_max_steps = 200
+ssr_fade_in = 0.117687
+ssr_fade_out = 0.196147
+ssr_depth_tolerance = 0.21
+glow_enabled = true
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_p6lpi"]
+render_priority = 0
+shader = ExtResource("3_176l0")
+shader_parameter/albedo = Color(0.02, 0.45, 0.8, 1)
+shader_parameter/metallic = 0.69
+shader_parameter/roughness = 0.17
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_7mqbm"]
+material = SubResource("ShaderMaterial_p6lpi")
+size = Vector2(100, 100)
+
+[sub_resource type="ConcavePolygonShape3D" id="ConcavePolygonShape3D_jq51r"]
+data = PackedVector3Array(5, 0, 5, -5, 0, 5, 5, 0, -5, -5, 0, 5, -5, 0, -5, 5, 0, -5)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_5uwlv"]
+size = Vector3(3.97479, 0.984863, 5.73776)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_c6hh7"]
+size = Vector3(6.56732, 1, 3.54288)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_dasqi"]
+size = Vector3(1, 0.986816, 1.02254)
+
+[node name="World" type="Node3D"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.0639393, 0, 0)
+script = ExtResource("1_1iytt")
+
+[node name="PlayerShip" parent="." instance=ExtResource("1_fkneg")]
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_l1d28")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(-0.446198, -0.747993, 0.491339, 0, 0.549023, 0.835807, -0.894934, 0.372936, -0.244973, 10.5385, 7.87279, -11.9379)
+shadow_enabled = true
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+mesh = SubResource("PlaneMesh_7mqbm")
+
+[node name="StaticBody3D" type="StaticBody3D" parent="MeshInstance3D"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.0226841, 0)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="MeshInstance3D/StaticBody3D"]
+transform = Transform3D(10, 0, 0, 0, 10, 0, 0, 0, 10, 0, 0, 0)
+shape = SubResource("ConcavePolygonShape3D_jq51r")
+
+[node name="EnemyContainer" type="Node3D" parent="."]
+
+[node name="spawnEnemy" type="Timer" parent="EnemyContainer"]
+wait_time = 10.0
+
+[node name="CanvasLayer" type="CanvasLayer" parent="."]
+
+[node name="Minimap" parent="CanvasLayer" instance=ExtResource("3_qoae3")]
+player = NodePath("../../PlayerShip")
+metadata/player = NodePath("../../PlayerShip")
+
+[node name="CanvasLayer2" type="CanvasLayer" parent="."]
+script = ExtResource("5_c6a6c")
+
+[node name="FPSDisplay" type="Label" parent="CanvasLayer2"]
+offset_left = 9.0
+offset_top = 4.0
+offset_right = 68.0
+offset_bottom = 27.0
+text = "FPS
+"
+
+[node name="Island" type="RigidBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 20.5703, 0, 0)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Island"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.62477, 0.499606, 1.11153)
+shape = SubResource("BoxShape3D_5uwlv")
+
+[node name="rocks-c2" parent="Island" instance=ExtResource("7_l64wg")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.89104, 0, 0)
+
+[node name="rocks-c3" parent="Island" instance=ExtResource("7_l64wg")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.9517, -0.584237, 1.01433)
+
+[node name="rocks-c4" parent="Island" instance=ExtResource("7_l64wg")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.28311, -0.285418, 2.60654)
+
+[node name="Island2" type="RigidBody3D" parent="."]
+transform = Transform3D(0.258819, 0, -0.965925, 0, 1, 0, 0.965925, 0, 0.258819, -22.1473, 0, 11.6807)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Island2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.59257, 0.511257, -0.0857582)
+shape = SubResource("BoxShape3D_c6hh7")
+
+[node name="rocks-c2" parent="Island2" instance=ExtResource("7_l64wg")]
+
+[node name="rocks-c3" parent="Island2" instance=ExtResource("7_l64wg")]
+transform = Transform3D(1, 0, -3.72529e-09, 0, 1, 0, 3.72529e-09, 0, 1, -1.84694, -0.33019, 0.0448475)
+
+[node name="rocks-c4" parent="Island2" instance=ExtResource("7_l64wg")]
+transform = Transform3D(1, 0, -7.45058e-09, 0, 1, 0, 7.45058e-09, 0, 1, -3.32726, -0.110152, -0.190083)
+
+[node name="Island3" type="RigidBody3D" parent="."]
+transform = Transform3D(-0.0242751, 0, -0.999705, 0, 1, 0, 0.999705, 0, -0.0242751, 9.07912, 0, -11.2944)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Island3"]
+transform = Transform3D(4.00001, 0, -5.21541e-08, 0, 4, 0, 5.21541e-08, 0, 4.00001, 1.75804, 2.05218, 0.548927)
+shape = SubResource("BoxShape3D_dasqi")
+
+[node name="CollisionShape3D3" type="CollisionShape3D" parent="Island3"]
+transform = Transform3D(4.00001, 0, -6.70552e-08, 0, 4, 0, 6.70552e-08, 0, 4.00001, -1.44085, 2.05218, -2.85583)
+shape = SubResource("BoxShape3D_dasqi")
+
+[node name="CollisionShape3D2" type="CollisionShape3D" parent="Island3"]
+transform = Transform3D(3, 0, -8.9407e-08, 0, 3, 0, 8.9407e-08, 0, 3, 2.06093, 1.49256, -3.01)
+shape = SubResource("BoxShape3D_dasqi")
+
+[node name="CollisionShape3D4" type="CollisionShape3D" parent="Island3"]
+transform = Transform3D(3.5, 0, -1.11759e-07, 0, 3.5, 0, 1.11759e-07, 0, 3.5, -2.01437, 1.71324, 0.79194)
+shape = SubResource("BoxShape3D_dasqi")
+
+[node name="patch-grass2" parent="Island3" instance=ExtResource("5_21eab")]
+transform = Transform3D(0.75, 0, -1.86265e-09, 0, 0.75, 0, 1.86265e-09, 0, 0.75, -1.80392, 0, 0.653166)
+
+[node name="rocks-a2" parent="Island3" instance=ExtResource("6_511a6")]
+transform = Transform3D(-0.0307366, 0, 1.24962, 0, 1.25, 0, -1.24962, 0, -0.0307366, -0.986971, 0, -1.95297)
+
+[node name="rocks-c2" parent="Island3" instance=ExtResource("7_l64wg")]
+transform = Transform3D(1.25, 0, -9.31323e-09, 0, 1.25, 0, 9.31323e-09, 0, 1.25, 1.39252, 0, 0.498051)
+
+[node name="rocks-c3" parent="Island3" instance=ExtResource("7_l64wg")]
+transform = Transform3D(-5.21541e-08, 0, 1.25, 0, 1.25, 0, -1.25, 0, -5.21541e-08, 1.44213, -0.139332, -2.55296)
+
+[node name="tower-complete-large2" parent="Island3" instance=ExtResource("8_kcdw3")]
+transform = Transform3D(0.25, 0, -1.39698e-09, 0, 0.25, 0, 1.39698e-09, 0, 0.25, -0.319132, 3.61093, -0.995287)
+
+[node name="flag-pirate-pennant2" parent="Island3" instance=ExtResource("9_d0eco")]
+transform = Transform3D(0.055217, 0, -0.243826, 0, 0.25, 0, 0.243826, 0, 0.055217, -0.313932, 6.04238, -0.997491)
+
+[node name="patch-sand2" parent="Island3" instance=ExtResource("10_cwq5t")]
+transform = Transform3D(0.25, 0, -9.31323e-10, 0, 0.25, 0, 9.31323e-10, 0, 0.25, -1.39932, 0, 1.81376)
+
+[node name="patch-sand3" parent="Island3" instance=ExtResource("10_cwq5t")]
+transform = Transform3D(0.25, 0, -1.86265e-09, 0, 0.25, 0, 1.86265e-09, 0, 0.25, -2.53051, 0, 2.13964)
+
+[node name="patch-sand4" parent="Island3" instance=ExtResource("10_cwq5t")]
+transform = Transform3D(0.25, 0, -2.32831e-09, 0, 0.25, 0, 2.32831e-09, 0, 0.25, -3.2511, -0.00552392, 1.61977)
+
+[node name="patch-sand5" parent="Island3" instance=ExtResource("10_cwq5t")]
+transform = Transform3D(-9.77889e-09, 0, 0.250001, 0, 0.25, 0, -0.250001, 0, -9.77889e-09, -3.67607, -0.00552392, 0.519714)
+
+[node name="patch-sand6" parent="Island3" instance=ExtResource("10_cwq5t")]
+transform = Transform3D(0.250001, 0, -4.65661e-10, 0, 0.25, 0, 4.65661e-10, 0, 0.250001, -3.339, -0.00879067, -0.424998)
+
+[node name="structure-platform-dock-small2" parent="Island3" instance=ExtResource("11_xo54m")]
+transform = Transform3D(0.15, 0, -2.32831e-10, 0, 0.15, 0, 2.32831e-10, 0, 0.15, -3.4485, -0.0446288, 2.27386)
+
+[node name="structure-platform-dock-small3" parent="Island3" instance=ExtResource("11_xo54m")]
+transform = Transform3D(0.15, 0, 0, 0, 0.15, 0, 0, 0, 0.15, -3.44814, -0.0446288, 2.62845)
+
+[node name="structure-platform-dock-small4" parent="Island3" instance=ExtResource("11_xo54m")]
+transform = Transform3D(0.15, 0, 0, 0, 0.15, 0, 0, 0, 0.15, -3.44671, -0.0446288, 2.99587)

@@ -1,0 +1,25 @@
+[gd_scene load_steps=5 format=3 uid="uid://ccp5t37sq2dfe"]
+
+[ext_resource type="PackedScene" uid="uid://dff02rjqsmowi" path="res://assets/cannon.glb" id="1_bwlqe"]
+[ext_resource type="Script" path="res://scripts/cannon.gd" id="1_q82hp"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ixvum"]
+vertex_color_use_as_albedo = true
+
+[sub_resource type="ImmediateMesh" id="ImmediateMesh_qp1jd"]
+
+[node name="Cannon" type="Node3D"]
+transform = Transform3D(0.25, 0, 0, 0, 0.25, 0, 0, 0, 0.25, 0, 0, 0)
+script = ExtResource("1_q82hp")
+
+[node name="cannon" parent="." instance=ExtResource("1_bwlqe")]
+
+[node name="muzzle" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.684717, 0.979355)
+
+[node name="ReloadTimer" type="Timer" parent="."]
+
+[node name="DebugLines" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.52581, 0.817062)
+material_override = SubResource("StandardMaterial3D_ixvum")
+mesh = SubResource("ImmediateMesh_qp1jd")

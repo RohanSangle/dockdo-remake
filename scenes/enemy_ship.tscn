@@ -1,0 +1,163 @@
+[gd_scene load_steps=18 format=3 uid="uid://cy30eew00fhu6"]
+
+[ext_resource type="PackedScene" uid="uid://q7nl6msm25kb" path="res://assets/ship-pirate-medium.glb" id="1_5lluk"]
+[ext_resource type="Script" path="res://scripts/enemy_ship.gd" id="1_rl11l"]
+[ext_resource type="Script" path="res://scripts/States/State_Machine.gd" id="3_45k1j"]
+[ext_resource type="Script" path="res://scripts/States/Idle.gd" id="4_gkojf"]
+[ext_resource type="Script" path="res://scripts/States/Follow.gd" id="5_36lm5"]
+[ext_resource type="Texture2D" uid="uid://d0xjyuolbi02t" path="res://assets/yellow_alert.png" id="6_7gqlx"]
+[ext_resource type="Texture2D" uid="uid://bd5q17qm341qa" path="res://assets/red_alert.png" id="7_loso3"]
+[ext_resource type="Script" path="res://scripts/States/Chase.gd" id="8_6u44w"]
+[ext_resource type="Script" path="res://scripts/States/ReturnHome.gd" id="9_fcp8i"]
+[ext_resource type="Script" path="res://scripts/States/Dead.gd" id="10_4nq6h"]
+[ext_resource type="PackedScene" uid="uid://ccp5t37sq2dfe" path="res://scenes/Cannon.tscn" id="10_gf56q"]
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_d1gnv"]
+radius = 0.568427
+height = 2.65644
+
+[sub_resource type="Animation" id="Animation_lnq3d"]
+length = 0.001
+tracks/0/type = "scale_3d"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath(".")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = PackedFloat32Array(0, 1, 1, 1, 1)
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("yellowalert:scale")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector3(0.25, 0.25, 0.25)]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("redalert:scale")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector3(0.25, 0.25, 0.25)]
+}
+
+[sub_resource type="Animation" id="Animation_q23lc"]
+resource_name = "Spawn"
+length = 0.8
+tracks/0/type = "scale_3d"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath(".")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = PackedFloat32Array(0, 1, 0.8, 0.8, 0.8, 0.4, 1, 1.2, 1.2, 1.2, 0.6, 1, 1, 1, 1)
+
+[sub_resource type="Animation" id="Animation_tbcno"]
+resource_name = "redAlert"
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("redalert:scale")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.2, 0.4),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 0,
+"values": [Vector3(0.15, 0.15, 0.15), Vector3(0.3, 0.3, 0.3), Vector3(0.25, 0.25, 0.25)]
+}
+
+[sub_resource type="Animation" id="Animation_6k1bv"]
+resource_name = "yellowAlert"
+length = 2.0
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("yellowalert:scale")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.2, 0.4),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 0,
+"values": [Vector3(0.1, 0.1, 0.1), Vector3(0.3, 0.3, 0.3), Vector3(0.25, 0.25, 0.25)]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_bha5d"]
+_data = {
+"RESET": SubResource("Animation_lnq3d"),
+"Spawn": SubResource("Animation_q23lc"),
+"redAlert": SubResource("Animation_tbcno"),
+"yellowAlert": SubResource("Animation_6k1bv")
+}
+
+[node name="EnemyShip" type="CharacterBody3D" groups=["Enemies", "minimap_objects"]]
+script = ExtResource("1_rl11l")
+
+[node name="ship-pirate-medium2" parent="." instance=ExtResource("1_5lluk")]
+transform = Transform3D(0.25, 0, 0, 0, 0.25, 0, 0, 0, 0.25, 0, 0, 0)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, -4.37114e-08, -1, 0, 1, -4.37114e-08, 0, 0.491254, -0.142755)
+shape = SubResource("CapsuleShape3D_d1gnv")
+
+[node name="StateMachine" type="Node3D" parent="." node_paths=PackedStringArray("initial_state")]
+script = ExtResource("3_45k1j")
+initial_state = NodePath("Idle")
+
+[node name="Idle" type="Node3D" parent="StateMachine" node_paths=PackedStringArray("enemy")]
+script = ExtResource("4_gkojf")
+enemy = NodePath("../..")
+
+[node name="Follow" type="Node3D" parent="StateMachine"]
+script = ExtResource("5_36lm5")
+
+[node name="Chase" type="Node3D" parent="StateMachine" node_paths=PackedStringArray("enemy")]
+script = ExtResource("8_6u44w")
+enemy = NodePath("../..")
+
+[node name="ReturnHome" type="Node3D" parent="StateMachine" node_paths=PackedStringArray("enemy")]
+script = ExtResource("9_fcp8i")
+enemy = NodePath("../..")
+
+[node name="Dead" type="Node3D" parent="StateMachine" node_paths=PackedStringArray("enemy")]
+script = ExtResource("10_4nq6h")
+enemy = NodePath("../..")
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
+libraries = {
+"": SubResource("AnimationLibrary_bha5d")
+}
+
+[node name="yellowalert" type="Sprite3D" parent="."]
+transform = Transform3D(0.25, 0, 0, 0, 0.25, 0, 0, 0, 0.25, 0, 2.92862, -0.226401)
+cast_shadow = 0
+billboard = 1
+texture = ExtResource("6_7gqlx")
+
+[node name="redalert" type="Sprite3D" parent="."]
+transform = Transform3D(0.25, 0, 0, 0, 0.25, 0, 0, 0, 0.25, 0, 2.95215, -0.220342)
+visible = false
+billboard = 1
+texture = ExtResource("7_loso3")
+
+[node name="CannonsL" type="Node3D" parent="."]
+transform = Transform3D(0.25, 0, 0, 0, 0.25, 0, 0, 0, 0.25, 0.313192, 0.152059, -0.0793115)
+
+[node name="L1Cannon" parent="CannonsL" instance=ExtResource("10_gf56q")]
+transform = Transform3D(-4.37114e-08, 0, 1, 0, 1, 0, -1, 0, -4.37114e-08, 0.482736, 0.141779, -0.228447)
+
+[node name="CannonsR" type="Node3D" parent="."]
+transform = Transform3D(0.25, 0, 0, 0, 0.25, 0, 0, 0, 0.25, 0, -0.0284893, -0.00325069)
+
+[node name="R1Cannon" parent="CannonsR" instance=ExtResource("10_gf56q")]
+transform = Transform3D(-4.37114e-08, 0, -1, 0, 1, 0, 1, 0, -4.37114e-08, -1.66061, 0.929755, -0.497774)
